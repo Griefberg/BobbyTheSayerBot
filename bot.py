@@ -1,6 +1,8 @@
 import logging
 import json
+import pymorphy2
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from nltk.stem.porter import PorterStemmer
 from utils import get_saying
 
 # Enable logging
@@ -8,6 +10,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+morph = pymorphy2.MorphAnalyzer()
+porter = PorterStemmer()
 
 # here should be config json with bot_token and database_url
 with open('config.json') as f:
@@ -23,6 +28,8 @@ def start(bot, update):
 
 def tell(bot, update, args):
     word = ' '.join(args)
+    word = morph.parse(word)[0].normalized[0] # normalize russian
+    word = porter.stem(word)
     saying = get_saying(word, CONFIG['database_url'])
     update.message.reply_text(saying)
 
