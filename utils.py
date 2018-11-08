@@ -10,8 +10,7 @@ def get_saying(word, database_url):
     """ % word
     result = pd.read_sql_query(sql, con=engine)
     engine.dispose()
-    return result.text.iloc[0]
-
-
-
-
+    if len(result) > 0:
+        return result.text.iloc[0]
+    else:
+        return "Sorry, there is no a such word in the database."
